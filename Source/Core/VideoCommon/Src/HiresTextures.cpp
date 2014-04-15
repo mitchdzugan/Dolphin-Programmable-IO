@@ -22,22 +22,45 @@ void Init(const char *gameCode)
 {
 	textureMap.clear();
 
-	std::vector<std::string> Directories;
+	CFileSearch::XStringVector Directories;
 	//Directories.push_back(File::GetUserPath(D_HIRESTEXTURES_IDX));
 	char szDir[MAX_PATH];
 	sprintf(szDir, "%s%s", File::GetUserPath(D_HIRESTEXTURES_IDX).c_str(), gameCode);
 	Directories.push_back(std::string(szDir));
 
 
-	std::vector<std::string> Extensions {
-		"*.png",
-		"*.bmp",
-		"*.tga",
-		"*.dds",
-		"*.jpg" // Why not? Could be useful for large photo-like textures
-	};
+	for (u32 i = 0; i < Directories.size(); i++)
+	{
+		File::FSTEntry FST_Temp;
+		File::ScanDirectoryTree(Directories[i], FST_Temp);
+		for (auto& entry : FST_Temp.children)
+		{
+			if (entry.isDirectory)
+			{
+				bool duplicate = false;
+				for (auto& Directory : Directories)
+				{
+					if (strcmp(Directory.c_str(), entry.physicalName.c_str()) == 0)
+					{
+						duplicate = true;
+						break;
+					}
+				}
+				if (!duplicate)
+					Directories.push_back(entry.physicalName.c_str());
+			}
+		}
+	}
 
-	auto rFilenames = DoFileSearch(Extensions, {szDir}, /*recursive=*/true);
+	CFileSearch::XStringVector Extensions;
+	Extensions.push_back("*.png");
+	Extensions.push_back("*.bmp");
+	Extensions.push_back("*.tga");
+	Extensions.push_back("*.dds");
+	Extensions.push_back("*.jpg"); // Why not? Could be useful for large photo-like textures
+
+	CFileSearch FileSearch(Extensions, Directories);
+	const CFileSearch::XStringVector& rFilenames = FileSearch.GetFileNames();
 	char code[MAX_PATH];
 	sprintf(code, "%s_", gameCode);
 

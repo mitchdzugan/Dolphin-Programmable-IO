@@ -447,7 +447,37 @@ void CGameListCtrl::ScanForISOs()
 {
 	ClearIsoFiles();
 
-	std::vector<std::string> Extensions;
+	CFileSearch::XStringVector Directories(SConfig::GetInstance().m_ISOFolder);
+
+	if (SConfig::GetInstance().m_RecursiveISOFolder)
+	{
+		for (u32 i = 0; i < Directories.size(); i++)
+		{
+			File::FSTEntry FST_Temp;
+			File::ScanDirectoryTree(Directories[i], FST_Temp);
+			for (auto& Entry : FST_Temp.children)
+			{
+				if (Entry.isDirectory)
+				{
+					bool duplicate = false;
+					for (auto& Directory : Directories)
+					{
+						if (strcmp(Directory.c_str(),
+									Entry.physicalName.c_str()) == 0)
+						{
+							duplicate = true;
+							break;
+						}
+					}
+					if (!duplicate)
+						Directories.push_back(
+								Entry.physicalName.c_str());
+				}
+			}
+		}
+	}
+
+	CFileSearch::XStringVector Extensions;
 
 	if (SConfig::GetInstance().m_ListGC)
 		Extensions.push_back("*.gcm");
@@ -461,7 +491,8 @@ void CGameListCtrl::ScanForISOs()
 	if (SConfig::GetInstance().m_ListWad)
 		Extensions.push_back("*.wad");
 
-	auto rFilenames = DoFileSearch(Extensions, {SConfig::GetInstance().m_ISOFolder}, SConfig::GetInstance().m_RecursiveISOFolder);
+	CFileSearch FileSearch(Extensions, Directories);
+	const CFileSearch::XStringVector& rFilenames = FileSearch.GetFileNames();
 
 	if (rFilenames.size() > 0)
 	{
