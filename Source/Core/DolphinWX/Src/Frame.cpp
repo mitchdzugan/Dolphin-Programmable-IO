@@ -38,6 +38,9 @@
 
 #include <wx/datetime.h> // wxWidgets
 
+#include "../GcnPadManager.h"
+#include "../GcnPadsManager.h"
+
 // Resources
 
 extern "C" {
@@ -347,7 +350,9 @@ CFrame::CFrame(wxFrame* parent,
 	g_TASInputDlg[2] = new TASInputDlg(this);
 	g_TASInputDlg[3] = new TASInputDlg(this);
 
-	Movie::SetInputManip(TASManipFunction);
+	PadsManager = new GcnPadsManager();
+
+	Movie::SetInputManip(PadManagedManipFunction);
 
 	State::SetOnAfterLoadCallback(OnAfterLoadCallback);
 
@@ -834,6 +839,12 @@ void TASManipFunction(SPADStatus *PadStatus, int controllerID)
 {
 	if (main_frame)
 		main_frame->g_TASInputDlg[controllerID]->GetValues(PadStatus, controllerID);
+}
+
+void PadManagedManipFunction(SPADStatus * PadStatus, int controllerID)
+{
+	if (main_frame)
+		main_frame->PadsManager->pads[controllerID]->PadManipFunction(PadStatus, controllerID);
 }
 
 bool TASInputHasFocus()

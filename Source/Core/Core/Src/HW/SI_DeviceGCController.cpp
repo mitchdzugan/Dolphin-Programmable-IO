@@ -16,6 +16,8 @@
 #include "ProcessorInterface.h"
 #include "../Core.h"
 
+#include "Movie.h"
+
 // --- standard gamecube controller ---
 CSIDevice_GCController::CSIDevice_GCController(SIDevices device, int _iDeviceNumber)
 	: ISIDevice(device, _iDeviceNumber)
@@ -118,7 +120,9 @@ bool CSIDevice_GCController::GetData(u32& _Hi, u32& _Low)
 {
 	_Hi = 0x80000000;
 	_Low = 0;
+	int cid = ISIDevice::m_iDeviceNumber;
 	g_SISyncClass.DequeueReport<SReport>(ISIDevice::m_iDeviceNumber, [&](SReport&& PadStatus) {
+		Movie::CallInputManip(&PadStatus, cid);
 		_Hi = MapPadStatus(PadStatus);
 
 		// Low bits are packed differently per mode

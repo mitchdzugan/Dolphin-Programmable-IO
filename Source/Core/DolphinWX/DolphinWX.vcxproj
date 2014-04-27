@@ -56,6 +56,9 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GcnPadManager.cpp" />
+    <ClCompile Include="GcnPadsManager.cpp" />
+    <ClCompile Include="PadsCommon.cpp" />
     <ClCompile Include="Src\AboutDolphin.cpp" />
     <ClCompile Include="Src\ARCodeAddEdit.cpp" />
     <ClCompile Include="Src\CheatsWindow.cpp" />
@@ -110,6 +113,9 @@
     <ClCompile Include="Src\WxUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GcnPadManager.h" />
+    <ClInclude Include="GcnPadsManager.h" />
+    <ClInclude Include="PadsCommon.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Src\AboutDolphin.h" />
     <ClInclude Include="Src\ARCodeAddEdit.h" />

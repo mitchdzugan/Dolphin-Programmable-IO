@@ -25,6 +25,7 @@
 #include "LogConfigWindow.h"
 #include "TASInputDlg.h"
 #include "Movie.h"
+#include "../GcnPadsManager.h"
 #if defined(HAVE_X11) && HAVE_X11
 #include "X11Utils.h"
 #endif
@@ -111,6 +112,7 @@ public:
 	CCodeWindow* g_pCodeWindow;
 	wxCheatsWindow* g_CheatsWindow;
 	TASInputDlg* g_TASInputDlg[4];
+	GcnPadsManager * PadsManager;
 
 	void InitBitmaps();
 	void DoPause();
@@ -351,6 +353,7 @@ void OnAfterLoadCallback();
 
 // For TASInputDlg
 void TASManipFunction(SPADStatus *PadStatus, int controllerID);
+void PadManagedManipFunction(SPADStatus *PadStatus, int controllerID);
 bool TASInputHasFocus();
 
 #endif  // __FRAME_H_

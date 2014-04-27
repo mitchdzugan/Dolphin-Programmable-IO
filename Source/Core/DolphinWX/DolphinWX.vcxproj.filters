@@ -25,6 +25,9 @@
     <Filter Include="Resources">
       <UniqueIdentifier>{d6bc4dd6-06ed-46ad-b327-04afb26e10ec}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ProgrammableIO">
+      <UniqueIdentifier>{0d2738a4-5893-4c27-bf77-e4137fea198a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\GLInterface\WGL.cpp" />
@@ -159,6 +162,15 @@
       <Filter>GUI</Filter>
     </ClCompile>
     <ClCompile Include="Src\stdafx.cpp" />
+    <ClCompile Include="GcnPadsManager.cpp">
+      <Filter>ProgrammableIO</Filter>
+    </ClCompile>
+    <ClCompile Include="GcnPadManager.cpp">
+      <Filter>ProgrammableIO</Filter>
+    </ClCompile>
+    <ClCompile Include="PadsCommon.cpp">
+      <Filter>ProgrammableIO</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\GLInterface\InterfaceBase.h" />
@@ -288,6 +300,15 @@
       <Filter>GUI</Filter>
     </ClInclude>
     <ClInclude Include="Src\stdafx.h" />
+    <ClInclude Include="GcnPadsManager.h">
+      <Filter>ProgrammableIO</Filter>
+    </ClInclude>
+    <ClInclude Include="GcnPadManager.h">
+      <Filter>ProgrammableIO</Filter>
+    </ClInclude>
+    <ClInclude Include="PadsCommon.h">
+      <Filter>ProgrammableIO</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="CMakeLists.txt" />
