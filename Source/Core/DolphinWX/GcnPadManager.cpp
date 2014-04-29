@@ -26,6 +26,10 @@
 GcnPadManager::GcnPadManager(GcnPadsManager * p)
 {
 	PadsManager = p;
+	PadQueueMutex = CreateMutex(
+		NULL,              // default security attributes
+		FALSE,             // initially not owned
+		NULL);             // unnamed mutex
 }
 
 GcnPadManager::~GcnPadManager()
@@ -36,24 +40,25 @@ GcnPadManager::~GcnPadManager()
 void GcnPadManager::PadManipFunction(SPADStatus * PadStatus, int controllerID)
 {
 	int current_frame = Movie::g_currentFrame;
-	char buff[255];
+	char buff[256];
+	
+	WaitForSingleObject(PadQueueMutex, INFINITE);
+	for (int i = 0; i<PadQueue.size(); i++)
+	{
+		if (PadQueue[i]->frame == current_frame)
+		{
+			*PadStatus = *PadQueue[i]->PadStatus;
+		}
+		if (PadQueue[0]->frame + 2 < current_frame)
+		{
+			PadQueue.erase(PadQueue.begin() + i);
+		}
+	}
 	buildPacket(buff, current_frame, controllerID, PadStatus);
+	ReleaseMutex(PadQueueMutex);
+
 	for (int i = 0; i < PadsManager->clients.size(); i++)
 	{
 		send(*PadsManager->clients[i], buff, strlen(buff), 0);
-	}
-
-	while (PadQueue.size() > 0 && PadQueue[0]->frame < current_frame)
-	{
-		for (int i = 0; i < PadsManager->clients.size(); i++)
-			send(*PadsManager->clients[i], "SHIT\n", 5, 0);
-		PadQueue.erase(PadQueue.begin());
-	}
-	if (PadQueue.size() > 0 && PadQueue[0]->frame == current_frame)
-	{
-		for (int i = 0; i < PadsManager->clients.size(); i++)
-			send(*PadsManager->clients[i], "FUCK\n", 5, 0);
-		*PadStatus = *PadQueue[0]->PadStatus;
-		PadQueue.erase(PadQueue.begin());
 	}
 }

@@ -4,7 +4,7 @@
 void buildPacket(char * buffer, int frame, int controller, SPADStatus * padStatus)
 {
 	sprintf(buffer, "%i;%i;%i;%i;%i;%i;%i;%i;%i;%i;%i\n", frame, controller,
-		padStatus->button, padStatus->stickX, padStatus->stickX, padStatus->substickX,
+		padStatus->button, padStatus->stickX, padStatus->stickY, padStatus->substickX,
 		padStatus->substickY, padStatus->triggerLeft, padStatus->triggerRight, padStatus->analogA, padStatus->analogB);
 }
 
@@ -26,6 +26,6 @@ void padStatusFromPacket(char * buffer, SPADStatus * padStatus)
 {
 	int ignore1, ignore2;
 	sscanf(buffer, "%i;%i;%i;%i;%i;%i;%i;%i;%i;%i;%i\n", &ignore1, &ignore2,
-		&padStatus->button, &padStatus->stickX, &padStatus->stickX, &padStatus->substickX,
+		&padStatus->button, &padStatus->stickX, &padStatus->stickY, &padStatus->substickX,
 		&padStatus->substickY, &padStatus->triggerLeft, &padStatus->triggerRight, &padStatus->analogA, &padStatus->analogB);
 }

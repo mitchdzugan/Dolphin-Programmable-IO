@@ -128,15 +128,27 @@ void clientManagerThread(void* pParams)
 
 	char recvbuf[DEFAULT_BUFLEN];
 	int recvbuflen = DEFAULT_BUFLEN;
-	SPADStatus * ps;
+	char buff[DEFAULT_BUFLEN];
+	int distanceToNewline = 0;
+	char * recvbufptr = recvbuf;
 
 	// Receive until the peer shuts down the connection
 	do {
 
+		memset(recvbuf, 0, DEFAULT_BUFLEN);
 		iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
-		if (iResult > 0) {
-			ps = new SPADStatus();
-			padsManager->pads[controllerFromPacket(recvbuf)]->PadQueue.push_back(new PadAtFrame(frameFromPacket(recvbuf), ps));
+
+		recvbufptr = recvbuf;
+		if (iResult > 0) 
+		{
+			while (true)
+			{
+				distanceToNewline = distanceToChar(recvbufptr, '\n') + 1;
+				if (!distanceToNewline)
+					break;
+				handlePacket(padsManager, recvbufptr, ClientSocket);
+				recvbufptr += distanceToNewline;
+			}
 		}
 
 	} while (1);
@@ -153,4 +165,51 @@ void clientManagerThread(void* pParams)
 	// cleanup
 	closesocket(ClientSocket);
 	WSACleanup();
+}
+
+void handlePacket(GcnPadsManager * padsManager, char * recvbuf, SOCKET s)
+{
+	SPADStatus * ps;
+	int semicolonCount = 0;
+	for (int i = 0; i < strlen(recvbuf) && recvbuf[i] != '\n'; i++)
+	{
+		if (recvbuf[i] == ';')
+			semicolonCount++;
+	}
+
+	if (strstr(recvbuf, "CLEAR"))
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			WaitForSingleObject(padsManager->pads[i]->PadQueueMutex, INFINITE);
+			padsManager->pads[i]->PadQueue.clear();
+			/*for (int j = 0; j < padsManager->pads[i]->PadQueue.size(); j++)
+			{
+				padsManager->pads[i]->PadQueue.erase(padsManager->pads[i]->PadQueue.begin() + j);
+			}*/
+			ReleaseMutex(padsManager->pads[i]->PadQueueMutex);
+		}
+	}
+	else if (semicolonCount == 10)
+	{
+		ps = new SPADStatus();
+		padStatusFromPacket(recvbuf, ps);
+		int cid = controllerFromPacket(recvbuf);
+		if (cid < 4)
+		{
+			WaitForSingleObject(padsManager->pads[cid]->PadQueueMutex, INFINITE);
+			padsManager->pads[cid]->PadQueue.push_back(new PadAtFrame(frameFromPacket(recvbuf), ps));
+			ReleaseMutex(padsManager->pads[cid]->PadQueueMutex);
+		}
+	}
+}
+
+int distanceToChar(char * buff, char v)
+{
+	for (int i = 0; i < strlen(buff); i++) 
+	{
+		if (buff[i] == v)
+			return i;
+	}
+	return -1;
 }

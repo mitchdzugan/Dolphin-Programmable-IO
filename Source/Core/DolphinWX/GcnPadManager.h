@@ -10,6 +10,7 @@
 
 #include <ws2tcpip.h>
 #include <winsock2.h>
+#include <windows.h>
 
 class PadAtFrame
 {
@@ -27,8 +28,12 @@ public:
 
 	GcnPadsManager * PadsManager;
 	std::vector <PadAtFrame *> PadQueue;
+	HANDLE PadQueueMutex;
 
 	void PadManipFunction(SPADStatus * PadStatus, int controllerID);
 };
+
+void handlePacket(GcnPadsManager * padsManager, char * recvbuf, SOCKET s);
+int distanceToChar(char * buff, char v);
 
 #endif
