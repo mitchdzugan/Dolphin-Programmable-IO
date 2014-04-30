@@ -343,7 +343,7 @@ bool DolphinApp::OnInit()
 #endif
 
 	main_frame = new CFrame((wxFrame*)NULL, wxID_ANY,
-				StrToWxStr(scm_rev_str),
+				StrToWxStr("Dolphin Programmable IO"),
 				wxPoint(x, y), wxSize(w, h),
 				UseDebugger, BatchMode, UseLogger);
 	SetTopWindow(main_frame);
