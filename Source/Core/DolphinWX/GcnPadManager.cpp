@@ -49,16 +49,28 @@ void GcnPadManager::PadManipFunction(SPADStatus * PadStatus, int controllerID)
 		{
 			*PadStatus = *PadQueue[i]->PadStatus;
 		}
-		if (PadQueue[0]->frame + 2 < current_frame)
+		/*
+		For some reason this causes input drops.
+		Commented it out causes memory leak.
+		This whole part is really sloppy anways. Need to ensure queue is ordered
+		and then just go through up until current frame.
+		if (PadQueue[i]->frame + 15 < current_frame)
 		{
+			delete PadQueue[i];
 			PadQueue.erase(PadQueue.begin() + i);
 		}
+		*/
 	}
+	
 	buildPacket(buff, current_frame, controllerID, PadStatus);
 	ReleaseMutex(PadQueueMutex);
 
 	for (int i = 0; i < PadsManager->clients.size(); i++)
 	{
-		send(*PadsManager->clients[i], buff, strlen(buff), 0);
+		if (send(*PadsManager->clients[i], buff, strlen(buff), 0) == SOCKET_ERROR)
+		{
+			PadsManager->clients.erase(PadsManager->clients.begin() + i);
+			i--;
+		}
 	}
 }

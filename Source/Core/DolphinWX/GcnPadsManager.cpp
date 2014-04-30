@@ -124,11 +124,10 @@ void clientManagerThread(void* pParams)
 	GcnPadsManager * padsManager = temp->padsManager;
 	SOCKET ClientSocket = *(temp->client);
 	delete temp;
-	int iResult, iSendResult;
+	int iResult;
 
 	char recvbuf[DEFAULT_BUFLEN];
 	int recvbuflen = DEFAULT_BUFLEN;
-	char buff[DEFAULT_BUFLEN];
 	int distanceToNewline = 0;
 	char * recvbufptr = recvbuf;
 
@@ -139,7 +138,7 @@ void clientManagerThread(void* pParams)
 		iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
 
 		recvbufptr = recvbuf;
-		if (iResult > 0) 
+		if (iResult > 0)
 		{
 			while (true)
 			{
@@ -183,10 +182,6 @@ void handlePacket(GcnPadsManager * padsManager, char * recvbuf, SOCKET s)
 		{
 			WaitForSingleObject(padsManager->pads[i]->PadQueueMutex, INFINITE);
 			padsManager->pads[i]->PadQueue.clear();
-			/*for (int j = 0; j < padsManager->pads[i]->PadQueue.size(); j++)
-			{
-				padsManager->pads[i]->PadQueue.erase(padsManager->pads[i]->PadQueue.begin() + j);
-			}*/
 			ReleaseMutex(padsManager->pads[i]->PadQueueMutex);
 		}
 	}
